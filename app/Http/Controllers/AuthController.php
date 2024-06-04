@@ -168,6 +168,9 @@ class AuthController extends Controller
             'Work_tasks' => 'required|string|max:255',
             'subcontracting' => 'boolean',
             'salary' => 'required|string|max:255',
+        ],[
+            "required" => "Veuillez remplire ce champs",
+            "email.unique" => "Cette adresse mail est déja utiliser !"
         ]);
 
         // Generate random 10 char password from below chars

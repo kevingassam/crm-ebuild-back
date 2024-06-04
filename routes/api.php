@@ -67,6 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/facture/{id}', [FactureController::class, 'show']);
     Route::get('/factures', [FactureController::class, 'showall']);
     Route::get('/factures/{id}/pdf', [FactureController::class, 'generatePdf']);
+    Route::get('/facture/{id}/send', [FactureController::class, 'senPdf']);
 
     //Route::get('/factures/{facture}/pdf', [FactureController::class, 'sendPdfToClient']);
     ////////////////////////devis////////////////////////

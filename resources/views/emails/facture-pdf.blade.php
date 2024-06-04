@@ -79,9 +79,9 @@
 <body>
 <div class="container">
     <div class="facture-header">
-        <img class="logo" src="{{ $logo }}" alt="Logo">
+        
         <h1>Facture n° {{ $facture->id }}</h1>
-        <p>Date : {{ $facture->date_creation->format('d/m/Y') }}</p>
+        <p>Date : {{ $facture->created_at->format('d/m/Y') }}</p>
         <p>Client : {{ $facture->client }}</p>
         <p>Email : {{ $facture->client_email }}</p>
     </div>

@@ -78,9 +78,9 @@ class FactureController extends Controller
             if (!$calculateTtc) {
                 // Only add to totalMontantTtc if calculateTtc is false
                 $totalMontantTtc += $operationData['montant_ht'] * (1 + ($operationData['taux_tva'] ?? 19) / 100) * $operationData['quantité'];
-            }else {
+            } else {
                 $totalMontantTtc += $operationData['montant_ht'] * $operationData['quantité'];
-        }
+            }
         }
 
         $totalMontantTtc += 1.00; // Add 1% timbre
@@ -154,91 +154,34 @@ class FactureController extends Controller
         return $result;
     }
 
-   public function generatePdf($id,Request $request)
+    public function generatePdf($id, Request $request)
     {
-
-
-        $facture= Facture::with('operationfactures')->findOrFail($id);
-        $client = Client::where('email', $facture->client_email)->first();
-        $phone_number = $client->phone_number;
-
-
-/*
-        // Create an instance of the PDF class
-        $pdf = app(PDF::class);
-
-        // Set the path to your logo image file
-        $logo = asset('resources/images/logo.svg');
-        $calculateTtc = $facture->calculateTtc; // Invert the calculateTtc value
-
-
-        $html = View::make('pdf.facture', compact('facture', 'phone_number','calculateTtc',  'logo', 'pdf'))->render();
-
-        $dompdf = new Dompdf();
-
-        $dompdf->loadHtml($html);
-        $contxt = stream_context_create([
-            'ssl' => [
-                'verify_peer' => FALSE,
-                'verify_peer_name' => FALSE,
-                'allow_self_signed' => TRUE,
-            ]
-        ]);
-
-        // Set the options on the PDF instance
-        $pdf->setOptions(['isHTML5ParserEnabled' => true, 'isRemoteEnabled' => true]);
-        $pdf->getDomPDF()->setHttpContext($contxt);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();*/
-      /*  $options = new Options();
-        $options->setIsRemoteEnabled(true); // Autoriser le chargement d'images distantes
-        $dompdf = new Dompdf($options);*/
-
-
-        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number'));
-
-      //  $dompdf->stream("facture.pdf");
-
-        //return $dompdf->stream("facture-{$facture->id}.pdf") ;
-        return $pdf->download('facture.pdf');
-
-
-
-    }
-   /* public function generatePdf($id, Request $request)
-    {
-
         $facture = Facture::with('operationfactures')->findOrFail($id);
         $client = Client::where('email', $facture->client_email)->first();
-
-
         $phone_number = $client->phone_number;
-        $calculateTtc = $facture->calculateTtc;
-        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number','calculateTtc'));
-
+        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number'));
         return $pdf->download('facture.pdf');
-         // Create an instance of the PDF class
-         $pdf = new Dompdf();
-         // Set the path to your logo image file
-        // $logo = asset('resources/images/logo.svg');
-      //   $calculateTtc = $facture->calculateTtc; // Invert the calculateTtc value
-         $html = View::make('pdf.facture', compact('facture', 'phone_number','calculateTtc', 'pdf'))->render();
-         $contxt = stream_context_create([
-             'ssl' => [
-                 'verify_peer' => FALSE,
-                 'verify_peer_name' => FALSE,
-                 'allow_self_signed' => TRUE,
-             ]
-         ]);
-         $pdf->getOptions()->setIsHtml5ParserEnabled(true);
-         $pdf->getOptions()->setIsRemoteEnabled(true);
-         $pdf->getOptions()->setHttpContext($contxt);
-         $pdf->setPaper('A4', 'portrait');
-         $pdf->loadHtml($html);
-         $pdf->render();
-         return $pdf->stream("facture-{$facture->id}.pdf");
+    }
 
-    }*/
+
+    public function senPdf($id, Request $request)
+    {
+        $facture = Facture::with('operationfactures')->findOrFail($id);
+        $client = Client::where('email', $facture->client_email)->first();
+        $phone_number = $client->phone_number;
+        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number'));
+
+        // Envoyer le PDF par mail
+        Mail::to($facture->client_email)->send(new FacturePdf($facture, $pdf));
+
+        //response
+        return response()->json(
+            [
+                "message" => "mail envoyer"
+            ],
+            200
+        );
+    }
 
     public function update(Request $request, $id)
     {
@@ -365,22 +308,16 @@ class FactureController extends Controller
         return response()->json($facture, 200);
     }
 
-      public function sendPdfToClient(Facture $facture,Request $request)
-      {
-          $facture->client_email = $request->input('email');
-          $client = Client::where('email', $facture->client_email)->first();
-          $pdf = $this->generatePdf($facture,$request);
+    public function sendPdfToClient(Facture $facture, Request $request)
+    {
+        $facture->client_email = $request->input('email');
+        $client = Client::where('email', $facture->client_email)->first();
+        $pdf = $this->generatePdf($facture, $request);
 
-          Mail::send([], [], function($message) use ($facture, $client, $pdf) {
-              $message->to($client->email)
-                  ->subject("Invoice #{$facture->id}")
-                  ->attachData($pdf->output(), "facture-{$facture->id}.pdf");
-          });
-
+        Mail::send([], [], function ($message) use ($facture, $client, $pdf) {
+            $message->to($client->email)
+                ->subject("Invoice #{$facture->id}")
+                ->attachData($pdf->output(), "facture-{$facture->id}.pdf");
+        });
     }
-
-
-
-
-
 }

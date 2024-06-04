@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -19,9 +20,9 @@ class ClientController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $data = $request->validate([
+       $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:clients',
+            'email' => 'required|email|unique:clients',
             'phone_number' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'social_reason' => 'required|string|max:255',
@@ -55,9 +56,12 @@ class ClientController extends Controller
             'RNE.max' => 'Le fichier RNE ne peut pas dépasser 3 Mo.',
 
         ]);
+        
+        
+
         $client = new Client();
-        $client->name = $data['name'];
-        $client->email = $data['email'];
+        $client->name = $request->input('name');
+        $client->email = $request->input('email');
         $client->phone_number = $request->input('phone_number');
         $client->address = $request->input('address');
         $client->social_reason = $request->input('social_reason');
@@ -74,8 +78,8 @@ class ClientController extends Controller
 
         // Create a new user with role client in the user table
         $user = new User();
-        $user->name = $data['name'];
-        $user->email = $data['email'];
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
         $user->password = Hash::make($password);
         $user->role = 'client';
         if ($user->save()) {
