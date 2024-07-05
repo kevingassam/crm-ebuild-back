@@ -137,6 +137,7 @@
     <thead>
     <tr>
         <th>Nature de l'opération</th>
+        <th><strong>Quantité</strong></th>
         <th>Montant HT</th>
         <th>Taux de TVA</th>
         @if (!is_null($devis->operations->first()->montant_ttc))
@@ -149,6 +150,7 @@
     @foreach($devis->operations as $operation)
         <tr>
             <td>{{ $operation->nature }}</td>
+            <td>{{ $operation->quantité }}</td>
             <td>{{ $operation->montant_ht }}</td>
             <td>{{ $operation->taux_tva }}</td>
             @if (!is_null($operation->montant_ttc))
@@ -165,6 +167,34 @@
     @endif
     </tbody>
 </table>
+
+<div class="totals">
+    <div style="margin-left: 50px;">
+      <h3><strong>Arrêter La Présente Devis A La Somme De:</strong></h3>
+  </div>
+  <table style="width: 220px; margin-left: 400px; text-align: right;">
+      <h1 style="margin-left: 60px;"><small>TOTAUX</small></h1>
+      <tr>
+          <th><strong>Total Montant HT</strong></th>
+          {{$ttc=0}}
+          @foreach($devis->operations as $operation)
+            {{ $ttc+=$operation->montant_ht *$operation->quantité}}
+            @endforeach 
+            <td>{{$ttc}}<strong>DT</strong></td>
+      </tr>
+      <tr>
+          <th><strong>TIMBRE</strong></th>
+          <td>1.00<strong>DT</strong></td>
+      </tr>
+      <tr>
+          <th><strong>TOTAL À PAYER</strong></th>
+          <td>{{$ttc+1}}<strong>DT</strong></td>
+      </tr>
+
+  </table>
+
+  
+</div>
 </body>
 </html>
 

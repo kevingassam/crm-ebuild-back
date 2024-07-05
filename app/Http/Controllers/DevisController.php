@@ -43,7 +43,6 @@ class DevisController extends Controller
 
         foreach ($request->input('operations') as $operationData) {
             $tauxTva = isset($operationData['taux_tva']) ? $operationData['taux_tva'] : 19; // Use 19 as default if taux_tva is not provided
-
             $operation = new Operation([
                 'nature' => $operationData['nature'],
                 'quantité' => $operationData['quantité'],
@@ -67,7 +66,7 @@ class DevisController extends Controller
             abort(403, 'Unauthorized action.');
         }*/
         $devis = Devis::with('operations')->findOrFail($id);
-
+         
         // Retrieve the client by email
         $client = Client::where('email', $devis->client_email)->first();
 
@@ -103,7 +102,7 @@ class DevisController extends Controller
         $devis = Devis::findOrFail($id);
         $calculateTtc = $request->input('calculate_ttc', true);
 
-        $devis->update([
+        $updateddevis=[
             'client'=>$client->name,
             'client_email' => $request['client_email'],
             'client_id' => $client->id,
@@ -111,9 +110,9 @@ class DevisController extends Controller
             'note'=>$request['note'],
             'nombre_operations' => count($request['operations']),
             'date_creation' => now(),
-        ]);
+        ];
 
-        $devis->update($devis);
+        $devis->update($updateddevis);
 
         // Delete existing operations
         $devis->operations()->delete();

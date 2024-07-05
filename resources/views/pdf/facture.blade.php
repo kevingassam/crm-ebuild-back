@@ -169,6 +169,10 @@
 </table>
 
 <div class="totals">
+    <div style="margin-left: 50px;">
+      <p><strong>Arrêter La Présente Facture A La Somme De:</strong></p>
+      <p>{{ $facture->total_montant_letters }}</p>
+  </div>
   <table style="width: 220px; margin-left: 400px; text-align: right;">
       <h1 style="margin-left: 60px;"><small>TOTAUX</small></h1>
       <tr>
@@ -192,10 +196,7 @@
 
   </table>
 
-  <div style="margin-left: 50px;">
-      <p><strong>Arrêter La Présente Facture A La Somme De:</strong></p>
-      <p>{{ $facture->total_montant_letters }}</p>
-  </div>
+  
 </div>
 </body>
 </html>

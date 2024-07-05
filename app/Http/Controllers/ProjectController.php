@@ -429,7 +429,7 @@ class ProjectController extends Controller
                            $ticket->description = $request->input('description');
                            $ticket->status=$request['status'] ?? $ticket->status;
                            $ticket->priority=$request['priority'] ?? $ticket->priority;
-                           /* if ($request->hasFile('files')) {
+                           if ($request->hasFile('files')) {
                                 $uploadedFiles = $request->file('files');
                                 foreach ($uploadedFiles as $uploadedFile) {
                                     if ($uploadedFile) {
@@ -439,7 +439,7 @@ class ProjectController extends Controller
                                         $ticket->files()->save($media);
                                     }
                                 }
-                            }*/
+                            }
                            $ticket->save();
                          return response()->json(['Success' => 'Ticket Updated'],200);
 

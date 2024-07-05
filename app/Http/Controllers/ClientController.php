@@ -75,7 +75,7 @@ class ClientController extends Controller
         $password = substr($random, 0, 10);
         $client->confirmation = $request->input('confirmation') ? true :  false;
         $client->password = $password;
-
+        $client->save();
         // Create a new user with role client in the user table
         $user = new User();
         $user->name = $request->input('name');
