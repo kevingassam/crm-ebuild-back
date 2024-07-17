@@ -24,12 +24,17 @@ class DevisController extends Controller
             'operations.*.quantité' => 'required|numeric|min:0',
             'operations.*.montant_ht' => 'required|numeric|min:0',
             'operations.*.taux_tva' => 'numeric|min:0',
-            'calculate_ttc' => 'boolean',
+          //  'operations.*.discount' => 'required|string|max:255',
+            'dpourcentage'=> 'nullable|numeric|min:0',
+            'discountType'=> 'nullable|string|max:255',
+            'TTCToggleButton' => 'boolean',
             'note' => 'nullable|string|max:255',
         ]);
 
         $client = Client::where('email', $request->input('client_email'))->first();
-        $calculateTtc = $request->input('calculate_ttc', true);
+        $calculateTtc = $request->input('TTCToggleButton');
+
+        
 
         $devis = Devis::create([
             'client'=>$client->name,
@@ -37,25 +42,59 @@ class DevisController extends Controller
             'client_id' => $client->id,
             'nombre_operations' => count($request['operations']),
             'date_creation' => now(),
+            'discount'=>$request['dpourcentage'],
             'note' => $request->input('note'),
 
         ]);
 
+
+        $discountType = $request->input('discountType');
+        $disp = $request->input('dpourcentage');
+        $totalMontantHt =0;
+
         foreach ($request->input('operations') as $operationData) {
             $tauxTva = isset($operationData['taux_tva']) ? $operationData['taux_tva'] : 19; // Use 19 as default if taux_tva is not provided
+
             $operation = new Operation([
                 'nature' => $operationData['nature'],
                 'quantité' => $operationData['quantité'],
                 'montant_ht' => $operationData['montant_ht'],
                 'taux_tva' => $tauxTva,
-                // 'montant_ttc' => $operationData['montant_ht'] * (1 + $tauxTva / 100),
+            //    'discount' => $operationData['discount'],
+
             ]);
-            if (!$calculateTtc) {
-                $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
-            }
+
+            if ($calculateTtc) {
+               $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
+           }
 
             $devis->operations()->save($operation);
+            $totalMontantHt += $operationData['montant_ht'] * $operationData['quantité'];
+
         }
+/*
+        if ($discountType!=null && $discountType="price"){
+            $totalMontantHt = $totalMontantHt-$disp ;
+
+
+        }
+        if ($discountType!=null && $discountType="percentage"){
+            $totalMontantHt = $totalMontantHt*(1-$disp/100) ;
+        }
+
+       */
+        $originalTotalMontantHt = $totalMontantHt; // Store the original total price
+
+        if ($discountType!= null && $discountType == "price") {
+            $totalMontantHt = $totalMontantHt - $disp;
+        }
+        if ($discountType!= null && $discountType == "percentage") {
+            $totalMontantHt = $originalTotalMontantHt * (1 - $disp / 100); // Use the original total price
+        }
+
+        $devis->update([
+            'total_priceht' => $totalMontantHt,
+        ]);
 
         return response()->json($devis, 201);
     }
@@ -90,8 +129,14 @@ class DevisController extends Controller
             'operations' => 'required|array|min:1',
             'operations.*.nature' => 'required|string|max:255',
             'operations.*.quantité' => 'required|numeric|min:0',
-            'operations.*.montant_ht' => 'required|numeric|min:0',
+            'operations.*.montant_ht' => 'nullable|numeric|min:0',
+            'operations.*.montant_ttc' => 'nullable|numeric|min:0',
+
             'operations.*.taux_tva' => 'numeric|min:0',
+           // 'operations.*.discount' => 'required|string|max:255',
+            'dpourcentage'=> 'nullable|numeric|min:0',
+            'discountType'=> 'nullable|string|max:255',
+
             'calculate_ttc' => 'boolean',
            // 'invoiced'=>'numeric|default:0',
             'note' => 'nullable|string|max:255',
@@ -100,7 +145,51 @@ class DevisController extends Controller
         $client = Client::where('email', $request->input('client_email'))->first();
         $switch = $request->input('switch', false);
         $devis = Devis::findOrFail($id);
-        $calculateTtc = $request->input('calculate_ttc', true);
+        $calculateTtc = $request->input('TTCToggleButton');
+
+      
+
+        // Delete existing operations
+        $devis->operations()->delete();
+        $discountType = $request->input('discountType');
+        $disp = $request->input('dpourcentage');
+        $totalMontantHt =0;
+
+        foreach ($request->input('operations') as $operationData) {
+            $tauxTva =  19; // Use 19 as default if taux_tva is not provided
+
+            $operation = new Operation([
+                'nature' => $operationData['nature'],
+                'quantité' => $operationData['quantité'],
+                'montant_ht' => $operationData['montant_ht'],
+                'taux_tva' => $tauxTva,
+            //    'discount' => $operationData['discount'],
+
+                // 'montant_ttc' => $operationData['montant_ht'] * (1 + $operationData['taux_tva'] / 100),
+                // 'montant_ttc' => $operationData['montant_ht'] * (1 + $tauxTva / 100),
+                'devis_id' => $devis->id, // Assign the devis_id to the operation
+            ]);
+        //    $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
+
+            if ($calculateTtc) {
+                $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
+            }
+            $totalMontantHt += $operationData['montant_ht'] * $operationData['quantité'];
+            $operation->save(); // Save the operation
+
+            $devis->operations()->save($operation);
+            $devis->operations()->save($operation); // Associate the operation with the devis
+        }
+
+
+        if ($discountType!=null && $discountType=="price"){
+            $totalMontantHt = $totalMontantHt-$disp ;
+
+
+        }
+        if ($discountType!=null && $discountType=="percentage"){
+            $totalMontantHt = $totalMontantHt*(1-$disp/100) ;
+        }
 
         $updateddevis=[
             'client'=>$client->name,
@@ -110,36 +199,13 @@ class DevisController extends Controller
             'note'=>$request['note'],
             'nombre_operations' => count($request['operations']),
             'date_creation' => now(),
+            'discount'=>$request['dpourcentage'],
+            'total_priceht'=> $totalMontantHt,
+
         ];
 
         $devis->update($updateddevis);
 
-        // Delete existing operations
-        $devis->operations()->delete();
-
-        foreach ($request->input('operations') as $operationData) {
-            $tauxTva = isset($operationData['taux_tva']) ? $operationData['taux_tva'] : 19; // Use 19 as default if taux_tva is not provided
-
-            $operation = new Operation([
-                'nature' => $operationData['nature'],
-                'quantité' => $operationData['quantité'],
-                'montant_ht' => $operationData['montant_ht'],
-                'taux_tva' => $tauxTva,
-                // 'montant_ttc' => $operationData['montant_ht'] * (1 + $operationData['taux_tva'] / 100),
-                // 'montant_ttc' => $operationData['montant_ht'] * (1 + $tauxTva / 100),
-                'devis_id' => $devis->id, // Assign the devis_id to the operation
-            ]);
-            $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
-
-            if (!$calculateTtc) {
-                $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
-            }
-
-            $operation->save(); // Save the operation
-
-            $devis->operations()->save($operation);
-            $devis->operations()->save($operation); // Associate the operation with the devis
-        }
 
         return response()->json($devis, 200);
     }
@@ -160,7 +226,7 @@ class DevisController extends Controller
     public function show(Request $request, $id)
     {
         $user = $request->user();
-        if (!$user->hasRole('admin')) {
+        if (!$user->hasRole('admin')&!$user->hasRole('client')) {
             abort(403, 'Unauthorized action.');
         }
         $devis = Devis::with('operations')->findOrFail($id);
@@ -169,10 +235,8 @@ class DevisController extends Controller
     }
     public function showall(Request $request)
     {
-
-
         $user = $request->user();
-        if (!$user->hasRole('admin')) {
+        if (!$user->hasRole('admin')&!$user->hasRole('client')) {
             abort(403, 'Unauthorized action.');
         }
         $devis = Devis::with('operations')->get();
@@ -185,7 +249,4 @@ class DevisController extends Controller
 
         return response()->json($devis, 200);
     }
-
-
-
 }

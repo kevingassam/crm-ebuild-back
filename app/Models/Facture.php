@@ -13,6 +13,7 @@ class Facture extends Model
         'client_email',
         'date_creation',
         'nombre_operations',
+        'discount',
         'total_montant_ht',
         'total_montant_ttc',
         'total_montant_letters',

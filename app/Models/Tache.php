@@ -11,8 +11,6 @@ class Tache extends Model
     protected $fillable = ['intitule',
      'deadline',
      'description',
-     'file',
-     'image',
      'important',
      'status',
      'project_id',
@@ -29,4 +27,8 @@ class Tache extends Model
     {
         return $this->belongsToMany(Personnel::class);
     }
+    public function files()
+        {
+            return $this->hasMany(FilesTache::class);
+        }
 }

@@ -13,16 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('taches', function (Blueprint $table) {
+        Schema::create('ebuilddata', function (Blueprint $table) {
             $table->id();
-            $table->string('intitule');
-            $table->dateTime('deadline');
-            $table->text('description');
-            $table->string('projectname');
-            $table->foreignId('project_id')->constrained()->onDelete('cascade');
-            $table->string('status')->default('InProgress');
-            $table->string('important')->default(0);
             $table->timestamps();
+            $table->string('name');
+            $table->string('mail');
+            $table->string('phone_number');
+            $table->text('address');
+            $table->string('matriculef');
+            $table->string('idunique');
+            $table->string('file')->nullable();
+            $table->string('logo')->nullable();
+
         });
     }
 
@@ -33,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('taches');
+        Schema::dropIfExists('ebuilddata');
     }
 };

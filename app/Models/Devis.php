@@ -10,6 +10,8 @@ class Devis extends Model
     protected $fillable = ['client',
         'client_email',
         'date_creation',
+        'discount',
+        'total_priceht',
         'nombre_operations',
         'invoiced'
           ];

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Mail\TicketCreated;
+use App\Notifications\TicketCreated as TicketCreatedNotif;
 use App\Models\Answer;
 use App\Models\Client;
 use App\Models\Ticket;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ProjectCreated;
 use App\Models\Personnel;
 use App\Models\Project;
-
+use Illuminate\Support\Facades\Notification;
 
 class ProjectController extends Controller
 {
@@ -260,7 +261,10 @@ class ProjectController extends Controller
 
         // Send email to admin and assigned personnel
         Mail::to($emails)->send(new TicketCreated($ticket, $project));
-
+        //send notification to admin
+        $client=Client::where('email',$project->client_email)->first();
+        $notify=new TicketCreatedNotif($client->name,$client->id,$ticket->getKey(),$ticket->object);
+        Notification::send(user::where('role','admin')->get(),$notify);
         return response()->json(['message' => 'Ticket created successfully'], 201);
     }
 

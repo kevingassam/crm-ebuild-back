@@ -13,16 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('taches', function (Blueprint $table) {
+        Schema::create('files_taches', function (Blueprint $table) {
             $table->id();
-            $table->string('intitule');
-            $table->dateTime('deadline');
-            $table->text('description');
-            $table->string('projectname');
-            $table->foreignId('project_id')->constrained()->onDelete('cascade');
-            $table->string('status')->default('InProgress');
-            $table->string('important')->default(0);
+            $table->unsignedBigInteger('tache_id');
+            $table->string('file_name');
+            $table->string('file_path');
+            // Add any additional columns you may need for file metadata
             $table->timestamps();
+            $table->foreign('tache_id')->references('id')->on('taches')->onDelete('cascade');
         });
     }
 
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('taches');
+        Schema::dropIfExists('files_taches');
     }
 };
