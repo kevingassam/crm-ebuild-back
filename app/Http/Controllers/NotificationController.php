@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\notification;
 use App\Models\personnel;
+use App\Models\client;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -31,11 +32,16 @@ class NotificationController extends Controller
         $notif->delete();
         return response()->json(['message' => 'notification deleted'], 200);
     }
-    public function showNotifTask($id,Request $request)
+    public function showNotifPersonnel($id,Request $request)
     {
             $personnel=personnel::where('email',$id)->firstOrFail();
-            $notifications =notification::where('type','App\Notifications\TaskCreated')->where('notifiable_id',$personnel->id)
-                                                                                        ->orderBy('created_at', 'desc')->get();
+            $notifications =notification::where('notifiable_id',$personnel->id)->orderBy('created_at', 'desc')->get();
+            return response()->json(['messages' => $notifications], 201);  
+    }
+    public function showNotifClient($id,Request $request)
+    {
+            $client=Client::where('email',$id)->firstOrFail();
+            $notifications =notification::where('notifiable_id',$client->id)->orderBy('created_at', 'desc')->get();
             return response()->json(['messages' => $notifications], 201);  
     }
 }

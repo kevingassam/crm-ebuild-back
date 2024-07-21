@@ -194,6 +194,11 @@ class TacheController extends Controller
         $taches=$personnel->taches()->where('status','Completed')->with('project')->get();
         return response()->json($taches,200);
     }
+    public function showtachesaffectedpersonnel($email){
+        $personnel=Personnel::where('email',$email)->firstOrFail();
+        $taches=$personnel->taches()->where('status','Affected')->with('project')->get();
+        return response()->json($taches,200);
+    }
     public function showtachesproject($id){
         $taches=Tache::where('project_id',$id)->with('project')->get();
 
@@ -201,6 +206,11 @@ class TacheController extends Controller
     }
     public function showtachescompletedproject($id){
         $taches=Tache::where('project_id',$id)->where('status','Completed')->with('project')->get();
+
+        return response()->json($taches, 200);
+    }
+    public function showtachesaffectedproject($id){
+        $taches=Tache::where('project_id',$id)->where('status','Affected')->with('project')->get();
 
         return response()->json($taches, 200);
     }
@@ -263,6 +273,12 @@ class TacheController extends Controller
     public function getCompleted()
     {
         $completedTasks = Tache::where('status', 'Completed')->get();
+
+        return response()->json($completedTasks, 200);
+    }
+    public function getAffected()
+    {
+        $completedTasks = Tache::where('status', 'Affected')->get();
 
         return response()->json($completedTasks, 200);
     }

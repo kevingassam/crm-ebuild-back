@@ -6,9 +6,11 @@ use App\Models\Client;
 use App\Models\Devis;
 use App\Models\Operation;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\DevisPdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
+use App\Models\EbuildData;
 class DevisController extends Controller
 {
     public function store(Request $request){
@@ -100,23 +102,138 @@ class DevisController extends Controller
     }
     public function generate($id,Request $request)
     {
-        $user = $request->user();
-      /*  if (!$user->hasRole('admin')) {
+        /*$user = $request->user();
+        if (!$user->hasRole('admin')) {
             abort(403, 'Unauthorized action.');
         }*/
         $devis = Devis::with('operations')->findOrFail($id);
-         
+
         // Retrieve the client by email
         $client = Client::where('email', $devis->client_email)->first();
+        $ebuilddata = EbuildData::first();
 
         // Retrieve the phone number and RNE from the client object
         $phone_number = $client->phone_number;
         $RNE = $client->RNE;
 
-        $pdf = PDF::loadView('pdf.devis', compact('devis', 'phone_number', 'RNE'));
+        // Convertir le montant total en toutes lettres
+        $totalPriceWithTax = (float)$devis->total_priceht*1.19 + 1;
+        $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
+
+        // Passer la valeur convertie à la vue
+        // Pass the image path to the view
+        $imagePath = url('storage/images/' . basename($ebuilddata->logo));
+        \Log::info("Image Path: " . $imagePath);  // Log the image path
+
+        $pdf = PDF::loadView('pdf.devis', compact('devis', 'phone_number', 'RNE', 'ebuilddata', 'totalPriceWithTaxInWords', 'imagePath'));
 
         return $pdf->download('devis.pdf');
     }
+   public function convertMontantToLetters($montant)
+   {
+       $units = [
+           '',
+           'un',
+           'deux',
+           'trois',
+           'quatre',
+           'cinq',
+           'six',
+           'sept',
+           'huit',
+           'neuf',
+       ];
+   
+       $tens = [
+           '',
+           'dix',
+           'vingt',
+           'trente',
+           'quarante',
+           'cinquante',
+           'soixante',
+           'soixante-dix',
+           'quatre-vingt',
+           'quatre-vingt-dix',
+       ];
+   
+       $hundreds = [
+           '',
+           'cent',
+           'deux-cent',
+           'trois-cent',
+           'quatre-cent',
+           'cinq-cent',
+           'six-cent',
+           'sept-cent',
+           'huit-cent',
+           'neuf-cent',
+       ];
+       $thousands = [
+        '',
+        'mille',
+        'deux-mille',
+        'trois-mille',
+        'quatre-mille',
+        'cinq-mille',
+        'six-mille',
+        'sept-mille',
+        'huit-mille',
+        'neuf-mille',
+    ];
+    
+       $montant = number_format($montant, 2, '.', '');
+       $intPart = (int)$montant;
+       $decPart = (int)($montant * 100) % 100;
+   
+       $result = '';
+   
+       if ($intPart >= 1000) {
+           $thousands = (int)($intPart / 1000);
+           if (isset($units[$thousands])) {
+               $result .= $units[$thousands] . ' mille ';
+           }
+           $intPart %= 1000;
+       }
+   
+       if ($intPart >= 100) {
+           $hundredsValue = (int)($intPart / 100);
+           if (isset($hundreds[$hundredsValue])) {
+               $result .= $hundreds[$hundredsValue] . ' ';
+           }
+           $intPart %= 100;
+       }
+   
+       if ($intPart >= 20) {
+           $tensValue = (int)($intPart / 10);
+           if (isset($tens[$tensValue])) {
+               $result .= $tens[$tensValue];
+           }
+           $intPart %= 10;
+           if ($tensValue == 7 || $tensValue == 9) {
+               $result = rtrim($result, 'e');
+           }
+           $result .= '-';
+       } elseif ($intPart >= 10) {
+           $specialTens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize'];
+           $result .= $specialTens[$intPart - 10] . '-';
+           $intPart = 0;
+       }
+   
+       if ($intPart > 0) {
+           if (isset($units[$intPart])) {
+               $result .= $units[$intPart] . ' ';
+           }
+       }
+   
+       $result .= 'Dinars';
+   
+       if ($decPart > 0) {
+           $result .= ' et ' . $decPart . ' Centimes';
+       }
+   
+       return $result;
+   }
     public function update(Request $request, $id)
     {
         $user = $request->user();
@@ -209,7 +326,30 @@ class DevisController extends Controller
 
         return response()->json($devis, 200);
     }
+    public function senPdf($id, Request $request)
+    {
+        $devis = Devis::with('operations')->findOrFail($id);
+         
+        // Retrieve the client by email
+        $client = Client::where('email', $devis->client_email)->first();
 
+        // Retrieve the phone number and RNE from the client object
+        $phone_number = $client->phone_number;
+        $RNE = $client->RNE;
+        $ebuilddata = EbuildData::first();
+        $totalPriceWithTax = (float)$devis->total_priceht*1.19 + 1;
+        $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
+
+        // Passer la valeur convertie à la vue
+        // Pass the image path to the view
+        $imagePath = url('storage/images/' . basename($ebuilddata->logo));
+        \Log::info("Image Path: " . $imagePath);  // Log the image path
+
+        $pdf = PDF::loadView('pdf.devis', compact('devis', 'phone_number', 'RNE', 'ebuilddata', 'totalPriceWithTaxInWords', 'imagePath'));
+        Mail::to($devis->client_email)->send(new DevisPdf($devis, $pdf));
+        //response
+        return $pdf->download('devis.pdf');
+    }
 
     public function destroy(Request $request, $id)
     {

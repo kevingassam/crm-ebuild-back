@@ -9,6 +9,7 @@ use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnswersController;
+use App\Http\Controllers\EbuildDataController;
 use App\Http\Controllers\TacheController;
 use App\Models\Facture;
 use Illuminate\Http\Request;
@@ -80,6 +81,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/devis/{id}', [DevisController::class, 'destroy']);
     Route::get('/devis/{id}', [DevisController::class, 'show']);
     Route::get('devis/{id}/pdf', [DevisController::class, 'generate']);
+    Route::get('/devis/{id}/send', [DevisController::class, 'senPdf']);
      ////////////////////////project////////////////////////
 
     Route::post('project/add', [ProjectController::class, 'store']);
@@ -99,8 +101,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/statistics/status', [ProjectController::class, 'getStatusStatistics']);
     Route::get('/statistics/priority', [ProjectController::class, 'getPriorityStatistics']);
     Route::get('/statistics/etat', [ProjectController::class, 'getEtatStatistics']);
-
-
+    Route::put('/ticket/validated/{id}',[ProjectController::class,'ticketCompleted']);
+    Route::put('/tickets/changeread',[ProjectController::class,'ticketChangeRead']);
 
 
 
@@ -125,10 +127,12 @@ Route::delete('/taches/{tache}',[TacheController::class, 'destroy']);
 Route::get('/taches/{tache}',[TacheController::class, 'show']);
 Route::get('/taches/personnel/{email}',[TacheController::class, 'showtachespersonnel']);
 Route::get('/taches/personnel/completed/{email}',[TacheController::class, 'showtachescompletedpersonnel']);
+Route::get('/taches/personnel/affected/{email}',[TacheController::class, 'showtachesaffectedpersonnel']);
 Route::get('/taches/personnel/important/{email}',[TacheController::class, 'showtachesimportantpersonnel']);
 Route::get('/taches/id/{idproject}',[TacheController::class, 'showtachesproject']);
 Route::get('/taches/completed/project/{idproject}',[TacheController::class, 'showtachescompletedproject']);
 Route::get('/taches/favoris/project/{idproject}',[TacheController::class, 'showtachesfavorisproject']);
+Route::get('/taches/affected/project/{idproject}',[TacheController::class, 'showtachesaffectedproject']);
 Route::get('/taches',[TacheController::class, 'showall']);
 Route::post('/taches/{tache}/comments', [TacheController::class, 'createcomment']);
 Route::get('/comments/taches/{tache}', [TacheController::class, 'commentsByTache']);
@@ -137,6 +141,7 @@ Route::post('/tache/completed/{tache}',[TacheController::class, 'changeCompleted
 Route::put('/tache/accept/{id}',[TacheController::class, 'changeAccept']);
 Route::get('/favori', [TacheController::class, 'getFavori']);
 Route::get('/completed', [TacheController::class, 'getCompleted']);
+Route::get('/affected', [TacheController::class, 'getAffected']);
 Route::get('/statistics/statusTache', [TacheController::class, 'getTacheStatusStatistics']);
 
 //Route::get('/devis/{id}', [DevisController::class, 'show']);
@@ -144,10 +149,13 @@ Route::get('/statistics/statusTache', [TacheController::class, 'getTacheStatusSt
 Route::get('devis/{id}/pdf', [DevisController::class, 'generate']);
 ////////////////////////notification//////////////////////////////////////////
 Route::get('/notifications/all', [NotificationController::class,'showAllNotif']);
-Route::get('/notifications/{task}', [NotificationController::class,'showNotifTask']);
+Route::get('/notifications/{personnel}', [NotificationController::class,'showNotifPersonnel']);
+Route::get('/notifications/client/{client}',[NotificationController::class,'showNotifClient']);
 Route::delete('/notifications/{id}',[NotificationController::class,'destroy']);
 /*
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 */
+Route::post('/dataebuild/{id}', [EbuildDataController::class, 'update']);
+Route::get('/dataebuild', [EbuildDataController::class, 'getData']);

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Mail\TicketCreated;
+use App\Mail\TicketValidated as TicketValidatedMail;
 use App\Notifications\TicketCreated as TicketCreatedNotif;
+use App\Notifications\TicketValidated;
 use App\Models\Answer;
 use App\Models\Client;
 use App\Models\Ticket;
@@ -15,7 +17,7 @@ use App\Mail\ProjectCreated;
 use App\Models\Personnel;
 use App\Models\Project;
 use Illuminate\Support\Facades\Notification;
-
+use Illuminate\Support\Facades\Log;
 class ProjectController extends Controller
 {
 
@@ -265,9 +267,28 @@ class ProjectController extends Controller
         $client=Client::where('email',$project->client_email)->first();
         $notify=new TicketCreatedNotif($client->name,$client->id,$ticket->getKey(),$ticket->object);
         Notification::send(user::where('role','admin')->get(),$notify);
+        foreach ($project->personnel as $i ){
+            Notification::send($i,$notify);
+        }
         return response()->json(['message' => 'Ticket created successfully'], 201);
     }
-
+    public function ticketCompleted($id,Request $request){
+   
+    
+    $ticket=Ticket::findOrFail($request->input('body'));
+    log::info($ticket);
+    $ticket->status='validated';
+    $ticket->save();
+    $project=Project::findOrFail($ticket->project_id);
+    log::info($project);
+    $client = Client::where('email', $project->client_email)->firstOrFail();
+    log::info($client);
+    $notify=new TicketValidated($client->name,$client->id,$ticket->id,$ticket->object,$project->projectname);
+    Notification::send($client,  $notify);
+    Notification::send(User::where('role','admin')->get(),  $notify);
+    Mail::to($client->email)->send(new TicketValidatedMail($ticket,$project));
+     return response()->json(['message' => 'Ticket updated successfully'], 200);
+    }
     public function showTicket($id)
     {
         $ticket = Ticket::with('project', 'user', 'files')->findOrFail($id);
@@ -285,7 +306,7 @@ class ProjectController extends Controller
         // Retrieve the tickets associated with the client's projects
         $tickets = Ticket::whereHas('project', function ($query) use ($user) {
             $query->where('client_email', $user->email);
-        })->get();
+        })->with('project')->orderBy('created_at', 'desc')->get();
 
         return response()->json(['tickets' => $tickets]);
     }
@@ -304,7 +325,7 @@ class ProjectController extends Controller
           // Retrieve all tickets assigned to the personnel
           $assignedTickets = Ticket::whereHas('project.personnel', function ($query) use ($personnel) {
               $query->where('personnel.id', $personnel->id);
-          })->get();
+          })->with('project')->orderBy('created_at', 'desc')->get();
 
         return response()->json(['tickets' => $assignedTickets]);
     }
@@ -316,9 +337,15 @@ class ProjectController extends Controller
         }
 
         // Retrieve all tickets
-        $tickets = Ticket::all();
+        $tickets = Ticket::with('project')->orderBy('created_at', 'desc')->get();
 
         return response()->json(['tickets' => $tickets]);
+    }
+    public function ticketChangeRead(Request $request){
+        $ticket=Ticket::findOrFail($request->input('body'));
+        $ticket->read=!$ticket->read;
+        $ticket->save();
+        return response()->json(['message' => 'Ticket updated successfully'],200);
     }
     public function answersByTicket(Request $request,$id)
     {

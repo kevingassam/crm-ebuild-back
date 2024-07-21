@@ -6,11 +6,10 @@
     <style>
         /* Add any custom CSS styles for the PDF here */
         body {
-            font-family: Arial, sans-serif;
+            font-family: Tahoma, sans-serif;
             font-size: 12px;
         }
         .facture-header {
-           // background-color: #eee;
             padding: 20px;
         }
         .header {
@@ -18,6 +17,14 @@
             align-items: center;
             justify-content: space-between;
         }
+        .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-top: 2px solid black;
+        text-align: center;
+        padding: 10px 0;
+    }
         .header img {
             width: 100px;
             height: 100px;
@@ -29,15 +36,18 @@
         }
         table {
             width: 100%;
+            border: 1px solid black;
             border-collapse: collapse;
+
             margin-top: 20px;
         }
         table th, table td {
-            border: 1px solid black;
+            border-bottom: 1px solid black;
+
             padding: 5px;
         }
         table th {
-            background-color: #f2e3ea;
+            background-color: #fceeef;
             font-weight: bold;
         }
 
@@ -63,10 +73,10 @@
             align-items: center;
             margin-left: -30px;
             height: 100%;
-            color: #a22b41;
+            color: #fa012e;
             font-size: 23px;
             width: 1000px;
-            font-family: Bold/* Adjust the width to fit your text */
+            font-family: Bold, Tahoma /* Adjust the width to fit your text */
         }
         .company-info {
             float: left;
@@ -84,65 +94,60 @@
     </style>
 </head>
 <body>
-<div class="vertical-text"><strong style="color: #000000;">DEVIS </strong>N°{{ $devis->formatted_id }}</div>
+<div  style="margin-top:24%" class="vertical-text"><strong style="color: #000000;">DEVIS </strong>N°{{ $devis->formatted_id }}</div>
 <div class="header">
+<div style="display: flex; align-items: center;">
+<div style="flex: 1;">
     <div class="facture-header">
-        <div class="company-info" >
-            <h2 style="font-size: 30px; font-family: Bold,serif ; color: #a22b41;">EBUILD</h2>
-            <p><strong>MF: EBUILD, SARL immatriculée au registre national </strong></p>
-            <p><strong>des entreprises sous l’identiant unique 1751386/T .</strong></p>
-
-            <p><strong>N° de téléphone:</strong>98157896</p>
-
-
-
-            <div style="margin-right: 140px;">
-
-                <p style="font-size: 20px; font-family: Bold,serif; display: inline-block;color: #a22b41;">De</p>
-                <hr style="border: 1px solid #a22b41;">
-                <p style="font-size: 16px;background-color: #eee;" > EBUILD</p>
-                <p><strong>Matricule Fiscal:</strong></p>
-                <p>EBUILD, SARL immatriculée au</p>
-                <p>registre national des entreprises </p>
-                <p>sous l’identiant unique 1751386/T.</p>
+        <div class="company-info">
+            <div class="col-8">
+        <h2 style="margin-bottom: 0px; font-size: 30px; font-family: Helvetica, sans-serif; color: #fa012e;">{{ strtoupper($ebuilddata->name) }}</h2>
+        <p><strong>MF: {{$ebuilddata->name}}, SARL immatriculée au registre national </strong></p>
+        <p><strong>des entreprises sous l’identiant unique {{$ebuilddata->matriculef}}.</strong></p>
+        <p><strong>{{$ebuilddata->phone_number}}</strong></p>
+        <p>{{$ebuilddata->mail}}</p>
+        <p>{{$ebuilddata->address}}</p>
+        </div>
+        <div class="col-4">
+        <div style="margin-left: 20px;"> <img src="" alt="" style="width: 100px; height: 100px;"></div></div>
+            <div style="margin-right: 140px; margin-top:27px">
+                <p style="font-size: 20px; font-family: Bold, Helvetica, sans-serif; display: inline-block;color: #fa012e;">De</p>
+                <hr style="border: 1px solid #fa012e;">
+                <p style="font-size: 16px; background-color: #edeaea;">{{ strtoupper($ebuilddata->name) }}</p>
+                </div>
+        </div>
+        <div class="client-info"> 
+            <div style="margin-top:248px; margin-right: 230px; text-align: left; margin-left: -100px;">
+                <p style="font-size: 20px; font-family: Bold, Helvetica, sans-serif; display: inline-block;color: #fa012e;">À</p>
+                <hr style="border: 1px solid #fa012e;">
+                <p style="font-size: 16px; background-color: #edeaea;">{{ $devis->client }}</p>
+                <p><strong>Email:</strong> {{ $devis->client_email }}</p>
+                <p><strong>N° de téléphone:</strong> {{ $phone_number }}</p>
+                <div style="margin-top: -150px;">
+            <h1 style="margin-right: -198px; text-align: right;"><strong>Numéro </strong><small>{{ $devis->formatted_id }}</small></h1>
+            <h1 style="margin-right: -198px; text-align: right;"><strong>Date </strong><small>{{ $devis->created_at->format('d/m/Y ') }}</small></h1>
+        </div>
             </div>
-        </div>
-        <div class="client-info">
-            <h1 style="margin-bottom: 135px;margin-left: -80px;"></h1>
-            <h1 style="text-align: right;"></h1>
-            <h1 style="margin-left: -80px;margin-bottom:-550px;"> </h1>
-
-            <div style="margin-right: 230px;text-align: left;margin-left: -100px;">
-                <p style="font-size: 20px; font-family: Bold,serif; display: inline-block;color: #a22b41;">À</p>
-                <hr style="border: 1px solid #a22b41;">
-                <p style="font-size: 16px;background-color: #eee;"> {{ $devis->client }}</p>
-            <p><strong>Email:</strong> {{ $devis->client_email }}</p>
-            <p><strong>N° de téléphone:</strong> {{ $phone_number }}</p>
-            </div>
-        </div>
-        <div>
-            <h1 style="margin-bottom: -150px;margin-left: 220px;"></h1>
-            <h1 style="text-align: right;"><strong>Numéro </strong><small>{{ $devis->formatted_id }}</small></h1>
-            <h1 style="margin-right: 0px;text-align: right;"><strong>Date </strong><small>{{ $devis->created_at->format('d/m/Y ') }}</small></h1>
-            <h1 style="margin-top: 0px"></h1>
-        </div>
+        </div> 
+        
         <div class="clear"></div>
+    </div> </div>
+    
     </div>
+
 </div>
 
-
-
-
-<table style="margin-left: 20px;">
+<table style="margin-left: 20px; ">
     <thead>
     <tr>
-        <th>Nature de l'opération</th>
-        <th><strong>Quantité</strong></th>
-        <th>Montant HT</th>
-        <th>Taux de TVA</th>
-        @if (!is_null($devis->operations->first()->montant_ttc))
-
+        <th>NATURE DE L'OPERATION</th>
+        <th><strong>QUANTITÉ </strong></th>
+        <th>MONTANT HT</th>
+        <th>TAXES</th>
+        @if (!is_null($devis->total_priceht))
         <th>Montant TTC</th>
+        <th>TOTAL HT</th>
+
         @endif
     </tr>
     </thead>
@@ -150,51 +155,81 @@
     @foreach($devis->operations as $operation)
         <tr>
             <td>{{ $operation->nature }}</td>
-            <td>{{ $operation->quantité }}</td>
-            <td>{{ $operation->montant_ht }}</td>
+            <td>x {{ $operation->quantité }}</td>
+            <td>{{ number_format((float)$operation->montant_ht, 2) }}</td>
             <td>{{ $operation->taux_tva }}</td>
-            @if (!is_null($operation->montant_ttc))
-            <td>{{ $operation->montant_ttc }}</td>
+            @if (!is_null($devis->total_priceht))
+            <td>{{ number_format((float)$operation->montant_ttc, 2) }}</td>
+            <td>{{number_format((float) $devis->total_priceht) }}</td>
             @endif
         </tr>
     @endforeach
     @if (!is_null($devis->note))
-
         <tr>
-        <td colspan="{{ !is_null($devis->operations->first()->montant_ttc) ? 4 : 3}}" >
+        <td colspan="{{!is_null($devis->total_priceht)? 5 : 3}}" >
             <strong>Note:</strong> {{ $devis->note }}</td>
     </tr>
     @endif
     </tbody>
 </table>
 
-<div class="totals">
-    <div style="margin-left: 50px;">
-      <h3><strong>Arrêter La Présente Devis A La Somme De:</strong></h3>
-  </div>
-  <table style="width: 220px; margin-left: 400px; text-align: right;">
-      <h1 style="margin-left: 60px;"><small>TOTAUX</small></h1>
-      <tr>
-          <th><strong>Total Montant HT</strong></th>
-          {{$ttc=0}}
-          @foreach($devis->operations as $operation)
-            {{ $ttc+=$operation->montant_ht *$operation->quantité}}
-            @endforeach 
-            <td>{{$ttc}}<strong>DT</strong></td>
-      </tr>
-      <tr>
-          <th><strong>TIMBRE</strong></th>
-          <td>1.00<strong>DT</strong></td>
-      </tr>
-      <tr>
-          <th><strong>TOTAL À PAYER</strong></th>
-          <td>{{$ttc+1}}<strong>DT</strong></td>
-      </tr>
-
-  </table>
-
-  
+<div class="totals" style="margin-top:20px">
+<table style="width: 200px; float: left; margin-left: 20px; text-align: right;">
+  <thead>
+    <tr>
+      <th><strong>*</strong></th>
+      <th><strong>BASE</strong></th>
+      <th><strong>TAUX</strong></th>
+      <th><strong>TAXE</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>19</td>
+      <td>{{ number_format((float)$devis->total_priceht) }}</td>
+      <td>19%</td>
+      <td>{{ number_format((float)$devis->total_priceht*0.19 -1)}}</td>
+    </tr>
+    <tr>
+      
+      <td>TIM</td>
+      <td>0,000</td>
+      <td></td>
+      <td>1,000</td>
+    </tr>
+    <tr>
+      <th><strong>TOTAL</strong></th>
+      <th></th>
+      <th></th>
+      <th><strong>{{ number_format((float)$devis->total_priceht*0.19) }}</strong></th>
+    </tr>
+  </tbody>
+</table>
+    <div style="width: 250px; float: left; margin-left: 20px;">
+        <h3><strong>Arrêter La Présente Facture A La Somme De:</strong></h3>
+        <h3>{{ $totalPriceWithTaxInWords }}</h3>
+        
+    </div>
+    <table style="width: 200px; float: left; margin-left: 20px; text-align: right;">
+        <tr>
+            <th><strong>Total Montant HT</strong></th>
+            <td>{{ number_format((float)$devis->total_priceht) }}<strong>DT</strong></td>
+        </tr>
+        @if (!is_null($devis->operations->first()->montant_ttc))
+            <tr>
+                <th><strong>TAXES</strong></th>
+                <td>{{ number_format((float)$devis->total_priceht*0.19) }}</td>
+            </tr>
+        @endif
+        
+        <tr>
+            <th><strong>TOTAL À PAYER</strong></th>
+            <td>{{ number_format((float)$devis->total_priceht*1.19+1) }}<strong>DT</strong></td>
+        </tr>
+    </table>
+    <div style="clear: both;"></div>
+</div>
+<div class="footer">
 </div>
 </body>
 </html>
-

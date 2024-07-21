@@ -8,6 +8,7 @@ use App\Mail\FacturePdf;
 use App\Models\Client;
 use App\Models\Facture;
 use App\Models\User;
+use App\Models\EbuildData;
 //use Barryvdh\DomPDF\PDF;
 use Barryvdh\DomPDF\Facade\Pdf;
 //use Barryvdh\DomPDF\Facade\Pdf as PDF;
@@ -117,7 +118,7 @@ class FactureController extends Controller
     function convertMontantToLetters($montant)
     {
         $units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
-        $tens = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt', 'quatre-vingt-dix'];
+        $tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt', 'quatre-vingt-dix'];
         $hundreds = ['', 'cent', 'deux-cent', 'trois-cent', 'quatre-cent', 'cinq-cent', 'six-cent', 'sept-cent', 'huit-cent', 'neuf-cent'];
 
         $montant = number_format($montant, 2, '.', '');
@@ -174,8 +175,18 @@ class FactureController extends Controller
     {
         $facture = Facture::with('operationfactures')->findOrFail($id);
         $client = Client::where('email', $facture->client_email)->first();
+        $iddata = 1;
+        $ebuilddata = EbuildData::first();
+
         $phone_number = $client->phone_number;
-        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number'));
+        $totalPriceWithTax = $facture->total_montant_ttc ;
+        $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
+
+       // $imagePath = storage_path('app/public/images/logo.png');
+        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata','totalPriceWithTaxInWords'));
+        // Add options to enable the footer where the page numbers will be displayed
+        $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isPhpEnabled' => true]);
+
         return $pdf->download('facture.pdf');
     }
 
@@ -185,18 +196,17 @@ class FactureController extends Controller
         $facture = Facture::with('operationfactures')->findOrFail($id);
         $client = Client::where('email', $facture->client_email)->first();
         $phone_number = $client->phone_number;
-        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number'));
+        $iddata = 1;
+        $ebuilddata = EbuildData::first();
+        $totalPriceWithTax = $facture->total_montant_ttc ;
+        $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
+        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata','totalPriceWithTaxInWords'));
 
         // Envoyer le PDF par mail
         Mail::to($facture->client_email)->send(new FacturePdf($facture, $pdf));
 
         //response
-        return response()->json(
-            [
-                "message" => "mail envoyer"
-            ],
-            200
-        );
+        return $pdf->download('facture.pdf');
     }
 
     public function update(Request $request, $id)

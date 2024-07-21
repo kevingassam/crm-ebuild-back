@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Facture</title>
+    <title>DEVIS</title>
     <style>
         /* Define your CSS styles here */
         body {
@@ -80,10 +80,10 @@
 <div class="container">
     <div class="facture-header">
         
-        <h1>Facture n° {{ $facture->id }}</h1>
-        <p>Date : {{ $facture->created_at->format('d/m/Y') }}</p>
-        <p>Client : {{ $facture->client }}</p>
-        <p>Email : {{ $facture->client_email }}</p>
+        <h1>Devis n° {{ $devis->id }}</h1>
+        <p>Date : {{ $devis->created_at->format('d/m/Y') }}</p>
+        <p>Client : {{ $devis->client }}</p>
+        <p>Email : {{ $devis->client_email }}</p>
     </div>
 
     <div class="facture-body">
@@ -94,26 +94,27 @@
                 <th>Quantité</th>
                 <th>Montant HT</th>
                 <th>Taux TVA</th>
+                <th>Montant HT</th>
                 <th>Montant TTC</th>
             </tr>
             </thead>
             <tbody>
-            @foreach($facture->operationfactures as $operation)
+            @foreach($devis->operations as $operation)
                 <tr>
                     <td>{{ $operation->nature }}</td>
                     <td>{{ $operation->quantité }}</td>
                     <td>{{ $operation->montant_ht }} TND</td>
                     <td>{{ $operation->taux_tva }}%</td>
-                    <td>{{ $operation->montant_ttc }} TND</td>
-                </tr>
+                    <td>{{ $operation->montant_ht }} TND</td>
+                    <td>{{ $operation->montant_ttc ?? '-' }} TND</td>
+                    </tr>
             @endforeach
             </tbody>
         </table>
 
         <div class="facture-total">
-            <p>Total HT : {{ $facture->total_montant_ht }} TND</p>
-            <p>Total TTC : {{ $facture->total_montant_ttc }} TND</p>
-            <p>Total en lettres : {{ $facture->total_montant_letters }} TND</p>
+            <p>Total HT : {{ $devis->total_priceht }} TND</p>
+            <p>Total TTC : {{ number_format((float)$devis->total_priceht*1.19, 2) }} TND</p>
         </div>
 
 
