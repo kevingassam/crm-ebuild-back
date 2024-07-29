@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DevisController;
 use App\Http\Controllers\FactureController;
+use App\Http\Controllers\MeetController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OperationController;
 use App\Http\Controllers\PdfController;
@@ -123,6 +124,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::post('/tachesss', [TacheController::class, 'storetache']);
 Route::post('/taches/update/{id}',[TacheController::class, 'update']);
+Route::post('/taches/update/status/{id}',[TacheController::class, 'updateStatus']);
 Route::delete('/taches/{tache}',[TacheController::class, 'destroy']);
 Route::get('/taches/{tache}',[TacheController::class, 'show']);
 Route::get('/taches/personnel/{email}',[TacheController::class, 'showtachespersonnel']);
@@ -159,3 +161,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 */
 Route::post('/dataebuild/{id}', [EbuildDataController::class, 'update']);
 Route::get('/dataebuild', [EbuildDataController::class, 'getData']);
+//////////////////////////meet////////////
+Route::get('/calendarglobal',[MeetController::class,'getclientandpersonnel']);
+Route::get('/calendarglobal/all',[MeetController::class,'getmeets']);
+Route::post('/calendarglobal/add',[MeetController::class,'addEvent']);
+Route::put('/calendarglobal/{id}',[MeetController::class,'updateEvent']);
+Route::delete('/calendarglobal/{id}',[MeetController::class,'deleteEvent']);

@@ -25,4 +25,8 @@ class Client extends Authenticatable
     {
         return $this->belongsTo(User::class);
     }
+    public function meets()
+{
+    return $this->belongsToMany(Meet::class,'guestsmeet');
+}
 }

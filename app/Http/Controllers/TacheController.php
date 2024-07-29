@@ -165,6 +165,11 @@ class TacheController extends Controller
         return response()->json(['error' => 'An error occurred while updating the tache '.$id], 500);
     }
     }
+    public function updateStatus(Request $request,$id){
+        $tache=Tache::findOrFail($id);
+        $tache->status=$request->input('status');
+        $tache->save();
+    }
     public function destroy(Tache $tache)
     {
         $tache->delete();

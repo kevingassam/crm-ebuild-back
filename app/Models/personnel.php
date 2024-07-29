@@ -32,4 +32,8 @@ class personnel extends Authenticatable
     {
         return $this->belongsToMany(Tache::class);
     }
+    public function meets()
+{
+    return $this->belongsToMany(Meet::class,'guestsmeet');
+}
 }
