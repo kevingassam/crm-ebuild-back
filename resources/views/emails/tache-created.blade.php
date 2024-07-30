@@ -71,7 +71,7 @@
         <h1>New Task Created</h1>
         <p>Intitule: {{ $intitule }}</p>
         <p>Deadline: {{ $deadline }}</p>
-        <p>Description: {{ $description }}</p>
+        <p>Description: {!! $description !!}</p>
         <p class="footer">Thank you for using our platform!</p>
     </div>
 </body>

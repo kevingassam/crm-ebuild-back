@@ -71,7 +71,7 @@
             <li><strong>Type of Project:</strong> {{ $project->typeofproject }}</li>
             <li><strong>Frameworks:</strong> {{ $project->frameworks }}</li>
             <li><strong>Database:</strong> {{ $project->database }}</li>
-            <li><strong>Description:</strong> {{ $project->description }}</li>
+            <li><strong>Description:</strong> {!! $project->description !!}</li>
             <li><strong>Date Created:</strong> {{ $project->datecreation }}</li>
             <li><strong>Deadline:</strong> {{ $project->deadline }}</li>
             <li><strong>Status:</strong> {{ $project->etat }}</li>

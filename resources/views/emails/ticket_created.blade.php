@@ -84,7 +84,7 @@
         <p>Ticket Details:</p>
         <ul>
             <li>Object: {{ $ticket->object }}</li>
-            <li>Description: {{ $ticket->description }}</li>
+            <li>Description: {!! $ticket->description !!}</li>
             <li>Closing Date: {{ $ticket->closing_date }}</li>
         </ul>
         <p>Please take necessary actions to resolve the ticket in a timely manner.</p>

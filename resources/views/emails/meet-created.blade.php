@@ -74,7 +74,7 @@
         <p>
             Meet Url: {{ $meet->url }}<br>
             Object: {{ $meet->title }}<br>
-            Description: {{$meet->description}}
+            Description: {!! $meet->description !!}
             Start Time: {{$meet->start}}<br>
             End Time :{{$meet->end}}<br>
 
