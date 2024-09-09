@@ -11,6 +11,7 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnswersController;
 use App\Http\Controllers\EbuildDataController;
+use App\Http\Controllers\HelleController;
 use App\Http\Controllers\TacheController;
 use App\Models\Facture;
 use Illuminate\Http\Request;
@@ -33,6 +34,7 @@ Route::view('reset-password/{token}', 'auth.reset-password')->name('password.res
 Route::post('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'forgot']);
 Route::post('reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'reset']);
 
+Route::post('/hello', [HelleController::class, 'hello']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
