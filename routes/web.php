@@ -31,8 +31,7 @@ use Illuminate\Support\Facades\Route;
 /*Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');*/
 
-/*
+
 Route::get('/', function () {
-    return view('welcome');
+    return "Bienvenue à l'API du CRM de E-build.tn ! 🚀";
 });
-*/
