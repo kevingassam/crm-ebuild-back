@@ -33,5 +33,5 @@ Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController
 
 
 Route::get('/', function () {
-    return "Bienvenue à l'API du CRM de E-build.tn ! 🚀";
+    return "Bienvenue à l'API du CRM de E-build.tn ! 🚀🚀";
 });
