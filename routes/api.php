@@ -34,7 +34,7 @@ Route::view('reset-password/{token}', 'auth.reset-password')->name('password.res
 Route::post('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'forgot']);
 Route::post('reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'reset']);
 
-Route::post('/hello', [HelleController::class, 'hello']);
+Route::get('/hello', [HelleController::class, 'hello']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
