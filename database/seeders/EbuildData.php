@@ -23,6 +23,7 @@ class EbuildData extends Seeder
                 'address' => "123 Main St, City, Country",
                 'matriculef' => "EF-123456789",
                 'idunique' => "https://www.e-build.tn",
+                'rib' => "xxx",
                 'created_at' => now(),
             ]
         );

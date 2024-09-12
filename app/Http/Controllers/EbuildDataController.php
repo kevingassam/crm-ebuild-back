@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Dompdf\Options;
-use App\Models\User;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
-use Illuminate\Http\Response;
 use App\Models\EbuildData;
-use Illuminate\Support\Facades\Log;
 
 
 class EbuildDataController extends Controller
@@ -16,7 +12,7 @@ class EbuildDataController extends Controller
 
     public function getData()
     {
-        $data = EbuildData::first(); // Fetch the first record, adjust as necessary
+        $data = EbuildData::first();
         if(!$data){
             return response()->json(
                 [
@@ -38,26 +34,23 @@ class EbuildDataController extends Controller
             'mf' => 'required|string',
             'address' => 'required|string',
             'rib' => 'required|string',
-            // adjust the mime types and max size as needed
         ]);
 
-        $id = 1;
-        $ebuildData = EbuildData::findOrFail($id);
-        $ebuildData->name = $request['name'];
-        $ebuildData->mail = $request['email'];
-        $ebuildData->address = $request['address'];
-        $ebuildData->phone_number = $request['phone'];
-        $ebuildData->matriculef = $request['mf'];
-        $ebuildData->rib = $request['rib'];
+        $ebuildData = EbuildData::first();
+        $ebuildData->name = $request->input('name');
+        $ebuildData->mail = $request->input('email');
+        $ebuildData->address = $request->input('address');
+        $ebuildData->phone_number = $request->input('phone');
+        $ebuildData->matriculef = $request->input('mf');
+        $ebuildData->rib = $request->input('rib');
 
         if ($request->hasFile('logo')) {
             $filename = $request->file('logo');
             $ebuildData->logo = $filename->store('public/images');
         }
 
-        $ebuildData->save();
-
         try {
+             $ebuildData->save();
             // validation and update logic here
             return response()->json(['message' => 'Ebuild data updated successfully']);
         } catch (\Exception $e) {
