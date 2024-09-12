@@ -31,6 +31,7 @@ class MeetCreated extends Mailable
     public function build()
     {
         return $this->view('emails.meet-created')
+        ->from('crm@e-build.tn', config("app.name"))
             ->subject('[EBUILD] New Meet Created');
     }
 }

@@ -39,6 +39,7 @@ class DevisPdf extends Mailable
 
         return $this->view('emails.devis-pdf')
             ->subject('[EBUILD] Your Devis PDF')
+            ->from('crm@e-build.tn', config("app.name"))
             ->attachData($this->pdf->output(), 'devis.pdf', [
                 'mime' => 'application/pdf',
             ]);

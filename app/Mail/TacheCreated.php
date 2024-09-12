@@ -43,6 +43,7 @@ class TacheCreated extends Mailable
 
         $email = $this->subject($subject)
             ->view('emails.tache-created')
+            ->from('crm@e-build.tn', config("app.name"))
             ->with([
                 'intitule' => $this->tache->intitule,
                 'deadline' => $this->tache->deadline,

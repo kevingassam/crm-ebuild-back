@@ -36,6 +36,7 @@ class TicketCreated extends Mailable
     {
         return $this->view('emails.ticket_created')
             ->subject('[EBUILD] New Ticket Created')
+            ->from('crm@e-build.tn', config("app.name"))
             ->with([
                 'ticket' => $this->ticket,
                 'project' => $this->project,
