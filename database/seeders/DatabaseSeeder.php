@@ -19,6 +19,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call([
+            EbuildData::class,
+        ]);
+
         DB::table('users')->insert([
             'name' => 'Achref Hamouda',
             'email' => 'Achrefhamouda1997@gmail.com',
