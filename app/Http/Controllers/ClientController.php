@@ -20,7 +20,7 @@ class ClientController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-       $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:clients',
             'phone_number' => 'required|string|max:255',
@@ -56,8 +56,12 @@ class ClientController extends Controller
             'RNE.max' => 'Le fichier RNE ne peut pas dépasser 3 Mo.',
 
         ]);
-        
-        
+
+
+        $confirmer = true;
+        if ($request->input('confirmation') == false || $request->input('confirmation') == "false") {
+            $confirmer = false;
+        }
 
         $client = new Client();
         $client->name = $request->input('name');
@@ -73,30 +77,42 @@ class ClientController extends Controller
         // Generate a random 10 char password from below chars
         $random = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890/+-*');
         $password = substr($random, 0, 10);
-        $client->confirmation = $request->input('confirmation') ? true :  false;
+        $client->confirmation = $confirmer;
         $client->password = $password;
         $client->save();
-        // Create a new user with role client in the user table
-        $user = new User();
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->password = Hash::make($password);
-        $user->role = 'client';
+
+
+
         if ($user->save()) {
-            if ($request->input('confirmation') ? true :  false) {
-                Mail::to($client->email)->send(new NewClientMail($client, $password));
+            if ($confirmer) {
+                // Create a new user with role client in the user table
+                $user = new User();
+                $user->name = $request->input('name');
+                $user->email = $request->input('email');
+                $user->password = Hash::make($password);
+                $user->role = 'client';
                 $client->save();
+
+                try {
+                    Mail::to($client->email)->send(new NewClientMail($client, $password));
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'message' => 'Client créé avec succès',
+                        ]
+                    );
+                } catch (\Exception $e) {
+                    // return du message d'erreur
+                    return response()->json(
+                        [
+                            'success' => false,
+                            'message' => 'Echec de la création du client',
+                            'error' => $e->getMessage(),
+                        ]
+                    );
+                }
             }
         }
-
-
-
-        return response()->json(
-            [
-                'success' => true,
-                'message' => 'Client créé avec succès',
-            ]
-        );
     }
 
 

@@ -20,7 +20,7 @@ use App\Models\Operationfacture;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\DB;
 
 class FactureController extends Controller
 {
@@ -176,7 +176,15 @@ class FactureController extends Controller
         $facture = Facture::with('operationfactures')->findOrFail($id);
         $client = Client::where('email', $facture->client_email)->first();
         $iddata = 1;
-        $ebuilddata = EbuildData::first();
+        $ebuilddata = DB::table('ebuilddata')->first();
+        if(!$ebuilddata){
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => "Les informations de personalisation du crm sont indisponibles !"
+                ]
+            );
+        }
 
         $phone_number = $client->phone_number;
         $totalPriceWithTax = $facture->total_montant_ttc ;

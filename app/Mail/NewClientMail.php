@@ -37,7 +37,9 @@ class NewClientMail extends Mailable
     public function build()
     {
         return $this->subject('[EBUILD] Your new account has been created')
-            ->view('new_client');
+            ->view('new_client')
+            ->from('crm@e-build.tn', config("app.name"))
+            ;
     }
 
 
