@@ -43,10 +43,6 @@ class EbuildDataController extends Controller
 
         $id = 1;
         $ebuildData = EbuildData::findOrFail($id);
-        log::info("hello");
-        log::info($request['name']);
-        log::info($request);
-        log::info($request['logo']);
         $ebuildData->name = $request['name'];
         $ebuildData->mail = $request['email'];
         $ebuildData->address = $request['address'];
