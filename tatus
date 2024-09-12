@@ -1,0 +1,89 @@
+[33mcommit 91cb77d0897a422ae2c7806cbe66e07be211c0a9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Thu Sep 12 11:48:09 2024 -0400
+
+    correction des envoies des mail
+
+[33mcommit 8b21a96d3f8975e94ac3b19508a7c8eba9fa4ca1[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Thu Sep 12 11:32:11 2024 -0400
+
+    correction de l'envoie de mail lors de la creation du personnel et du telechargement du pdf des devis
+
+[33mcommit 058edf2855a6d393334a80074c6613a921a90153[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Mon Sep 9 19:49:06 2024 -0400
+
+    change admin user email and name
+
+[33mcommit 595fa53592098090bb7275d2891e4483f309bf13[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Mon Sep 9 19:44:18 2024 -0400
+
+    ajout d'un message sur /
+
+[33mcommit a87fe1b60ef9be00df5c7d4a2acc6338dc211961[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Mon Sep 9 19:42:29 2024 -0400
+
+    ajouter un message sur /
+
+[33mcommit 522aee53bb7526adc5956ae05e02242df4de947a[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Mon Sep 9 19:32:52 2024 -0400
+
+    delete maj
+
+[33mcommit bf350c0645927dcb6f078b69eb689cca079f813b[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Mon Sep 9 13:35:18 2024 -0400
+
+    correction de la methode post a get
+
+[33mcommit a8937f9d50a99eede8c810f7ba3b8954cc03343e[m
+Author: kg <48618359+kevingassam@users.noreply.github.com>
+Date:   Mon Sep 9 13:33:41 2024 -0400
+
+    ajout du hello world pour le test
+
+[33mcommit 18491d7299c987c7075642e97761c057a4f769a4[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31mupstream/HEAD[m[33m)[m
+Author: heithemb <heithem.benmoussa.71@gmail.com>
+Date:   Tue Jul 30 16:48:00 2024 +0100
+
+    vf
+
+[33mcommit b8988137d6c26626742c4304cdd5ab5e1f5641a9[m
+Author: heithemb <heithem.benmoussa.71@gmail.com>
+Date:   Mon Jul 29 01:24:39 2024 +0100
+
+    ''
+
+[33mcommit e17cd4ceb5b6dd21d7da58c42d69e4cffa198a1d[m
+Author: heithemb <heithem.benmoussa.71@gmail.com>
+Date:   Mon Jul 22 00:26:01 2024 +0100
+
+    ''
+
+[33mcommit a6e5bd881263676387a4aa7fb2a8eac76e06bd5c[m
+Author: heithemb <heithem.benmoussa.71@gmail.com>
+Date:   Wed Jul 17 18:51:53 2024 +0100
+
+    v2
+
+[33mcommit 287d5b0b875d0e37d5b13bd127859a5f24ba8e21[m
+Author: heithemb <heithem.benmoussa.71@gmail.com>
+Date:   Fri Jul 5 14:30:17 2024 +0100
+
+    commit1
+
+[33mcommit 98b09a8a8077e41b7364e78371b4203d43220fee[m
+Author: Ebuild-git <achref.hamouda@e-build.tn>
+Date:   Tue Jun 4 13:50:06 2024 +0100
+
+    e
+
+[33mcommit ea945a5799f1d42010b7fda9efbb73cec3b1637f[m
+Author: Ebuild-git <achref.hamouda@e-build.tn>
+Date:   Fri May 31 15:39:01 2024 +0100
+
+    first commit
