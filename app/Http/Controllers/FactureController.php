@@ -195,14 +195,14 @@ class FactureController extends Controller
             return response()->json([
                 'message' => 'Facture non trouvée',
                 'statut' => false,
-            ], 404);
+            ]);
         }
         $client = Client::where('email', $facture->client_email)->first();
         if(!$client){
             return response()->json([
                 'message' => 'Client non trouvé',
                 'statut' => false,
-            ], 404);
+            ]);
         }
         $phone_number = $client->phone_number;
         $ebuilddata = EbuildData::first();
@@ -210,7 +210,7 @@ class FactureController extends Controller
             return response()->json([
                 'message' => 'Les informations de personalisation du crm sont indisponibles!',
                 'statut' => false,
-            ],200);
+            ]);
         }
         $totalPriceWithTax = $facture->total_montant_ttc;
         $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
@@ -228,7 +228,7 @@ class FactureController extends Controller
                 'error' => $e->getMessage(),
                 'message' => "Echec de l'envoie de la facture",
                 'statut' => false,
-            ]);
+            ],500);
         }
     }
 
