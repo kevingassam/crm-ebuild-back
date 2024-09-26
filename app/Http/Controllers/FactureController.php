@@ -190,11 +190,28 @@ class FactureController extends Controller
 
     public function senPdf($id, Request $request)
     {
-        $facture = Facture::with('operationfactures')->findOrFail($id);
+        $facture = Facture::with('operationfactures')->find($id);
+        if(!$facture){
+            return response()->json([
+                'error' => 'Facture non trouvée',
+                'statut' => false,
+            ], 404);
+        }
         $client = Client::where('email', $facture->client_email)->first();
+        if(!$client){
+            return response()->json([
+                'error' => 'Client non trouvé',
+                'statut' => false,
+            ], 404);
+        }
         $phone_number = $client->phone_number;
-        $iddata = 1;
         $ebuilddata = EbuildData::first();
+        if(!$ebuilddata){
+            return response()->json([
+                'error' => 'Les informations de personalisation du crm sont indisponibles!',
+                'statut' => false,
+            ]);
+        }
         $totalPriceWithTax = $facture->total_montant_ttc;
         $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
         $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata', 'totalPriceWithTaxInWords'));
@@ -209,6 +226,7 @@ class FactureController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),
+                'message' => "Echec de l'envoie de la facture",
                 'statut' => false,
             ], 500);
         }
