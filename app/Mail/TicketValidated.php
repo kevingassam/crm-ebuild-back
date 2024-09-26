@@ -35,7 +35,7 @@ class TicketValidated extends Mailable
         
         return $this->view('emails.ticket_validated')
             ->subject('[EBUILD] Ticket Validated')
-            ->from('crm@e-build.tn', config("app.name"))
+            
             ->with([
                 'ticket' => $this->ticket,
                 'project' => $this->project,

@@ -32,7 +32,7 @@ class MeetUpdated extends Mailable
     public function build()
     {
         return $this->view('emails.meet-updated')
-        ->from('crm@e-build.tn', config("app.name"))
+        
             ->subject('[EBUILD] New Meet Updated');
     }
 }

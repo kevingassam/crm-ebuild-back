@@ -92,25 +92,25 @@ class ClientController extends Controller
                 $user->password = Hash::make($password);
                 $user->role = 'client';
                 $client->save();
+            }
 
-                try {
-                    Mail::to($client->email)->send(new NewClientMail($client, $password));
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Client créé avec succès',
-                        ]
-                    );
-                } catch (\Exception $e) {
-                    // return du message d'erreur
-                    return response()->json(
-                        [
-                            'success' => false,
-                            'message' => 'Echec de la création du client',
-                            'error' => $e->getMessage(),
-                        ]
-                    );
-                }
+            try {
+                Mail::to($client->email)->send(new NewClientMail($client, $password));
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => 'Client créé avec succès',
+                    ]
+                );
+            } catch (\Exception $e) {
+                // return du message d'erreur
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => "Echec de l'envoie de mail mais la création du compte a été effectuer ",
+                        'error' => $e->getMessage(),
+                    ]
+                );
             }
         }
     }

@@ -44,7 +44,7 @@ class NewUserEmail extends Mailable
     public function build()
     {
         return $this->markdown('emails.new-user')
-        ->from('crm@e-build.tn', config("app.name"))
+        
             ->with([
                 'email' => $this->emailData['email'],
                 'password' => $this->emailData['password']

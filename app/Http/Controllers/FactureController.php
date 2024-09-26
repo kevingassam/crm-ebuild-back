@@ -3,24 +3,14 @@
 namespace App\Http\Controllers;
 
 
-use Dompdf\Options;
 use App\Mail\FacturePdf;
 use App\Models\Client;
 use App\Models\Facture;
-use App\Models\User;
 use App\Models\EbuildData;
-//use Barryvdh\DomPDF\PDF;
 use Barryvdh\DomPDF\Facade\Pdf;
-//use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Http\Request;
-
-use Dompdf\Dompdf;
-
 use App\Models\Operationfacture;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\View;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 
 class FactureController extends Controller
 {
@@ -38,9 +28,9 @@ class FactureController extends Controller
             'operationfactures.*.nature' => 'required|string|max:255',
             'operationfactures.*.quantité' => 'required|integer|min:1',
             'operationfactures.*.montant_ht' => 'required|numeric|min:0',
-           // 'operationfactures.*.taux_tva' => 'numeric|min:0',
-            'dpourcentage'=> 'nullable|numeric|min:0',
-            'discountType'=> 'nullable|string|max:255',
+            // 'operationfactures.*.taux_tva' => 'numeric|min:0',
+            'dpourcentage' => 'nullable|numeric|min:0',
+            'discountType' => 'nullable|string|max:255',
 
             'calculate_ttc' => 'boolean',
             'note' => 'nullable|string|max:255',
@@ -65,7 +55,7 @@ class FactureController extends Controller
         $discountType = $request->input('discountType');
 
         foreach ($request->input('operationfactures') as $operationData) {
-          $tauxTva = 19; // Use 19 as default if taux_tva is not provided
+            $tauxTva = 19; // Use 19 as default if taux_tva is not provided
 
             $operation = new Operationfacture([
                 'nature' => $operationData['nature'],
@@ -78,14 +68,13 @@ class FactureController extends Controller
 
             $totalMontantHt += $operationData['montant_ht'] * $operationData['quantité'];
 
-                // Only add to totalMontantTtc if calculateTtc is false
-                $totalMontantTtc += $operationData['montant_ht'] * (1 + ($operationData['taux_tva'] ?? 19) / 100) * $operationData['quantité'];
-           
+            // Only add to totalMontantTtc if calculateTtc is false
+            $totalMontantTtc += $operationData['montant_ht'] * (1 + ($operationData['taux_tva'] ?? 19) / 100) * $operationData['quantité'];
         }
         $totalMontantTtc += 1.00; // Add 1% timbre
 
-         $disp=$request->input('dpourcentage');
-   /*     if ($dis!=null || $dis!=0)
+        $disp = $request->input('dpourcentage');
+        /*     if ($dis!=null || $dis!=0)
         {
             $totalMontantHt=  $totalMontantHt*(1-$dis/100);
             $totalMontantTtc=  $totalMontantTtc*(1-$dis/100);
@@ -96,10 +85,10 @@ class FactureController extends Controller
 
 
         // Conve
-        if ($discountType!= null && $discountType == "percentage ") {
+        if ($discountType != null && $discountType == "percentage ") {
             $totalMontantHt *= (1 - $disp / 100);
             $totalMontantTtc *= (1 - $disp / 100);
-        } elseif ($discountType!= null && $discountType == 'price') {
+        } elseif ($discountType != null && $discountType == 'price') {
             $totalMontantHt -= $disp;
             $totalMontantTtc -= $disp;
         }
@@ -176,8 +165,8 @@ class FactureController extends Controller
         $facture = Facture::with('operationfactures')->findOrFail($id);
         $client = Client::where('email', $facture->client_email)->first();
         $iddata = 1;
-        $ebuilddata = DB::table('ebuilddata')->first();
-        if(!$ebuilddata){
+        $ebuilddata = EbuildData::first();
+        if (!$ebuilddata) {
             return response()->json(
                 [
                     'status' => false,
@@ -187,11 +176,11 @@ class FactureController extends Controller
         }
 
         $phone_number = $client->phone_number;
-        $totalPriceWithTax = $facture->total_montant_ttc ;
+        $totalPriceWithTax = $facture->total_montant_ttc;
         $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
 
-       // $imagePath = storage_path('app/public/images/logo.png');
-        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata','totalPriceWithTaxInWords'));
+        // $imagePath = storage_path('app/public/images/logo.png');
+        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata', 'totalPriceWithTaxInWords'));
         // Add options to enable the footer where the page numbers will be displayed
         $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isPhpEnabled' => true]);
 
@@ -206,15 +195,23 @@ class FactureController extends Controller
         $phone_number = $client->phone_number;
         $iddata = 1;
         $ebuilddata = EbuildData::first();
-        $totalPriceWithTax = $facture->total_montant_ttc ;
+        $totalPriceWithTax = $facture->total_montant_ttc;
         $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
-        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata','totalPriceWithTaxInWords'));
+        $pdf = PDF::loadView('pdf.facture', compact('facture', 'phone_number', 'ebuilddata', 'totalPriceWithTaxInWords'));
 
-        // Envoyer le PDF par mail
-        Mail::to($facture->client_email)->send(new FacturePdf($facture, $pdf));
-
-        //response
-        return $pdf->download('facture.pdf');
+        try {
+            // Envoyer le PDF par mail
+            Mail::to($facture->client_email)->send(new FacturePdf($facture, $pdf));
+            return response()->json([
+                'message' => 'Facture envoyée par mail',
+                'statut' => true,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'statut' => false,
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -231,8 +228,8 @@ class FactureController extends Controller
             'operationfactures.*.nature' => 'required|string|max:255',
             'operationfactures.*.quantité' => 'required|integer|min:1',
             'operationfactures.*.montant_ht' => 'required|numeric|min:0',
-            'dpourcentage'=> 'nullable|numeric|min:0',
-            'discountType'=> 'nullable|string|max:255',
+            'dpourcentage' => 'nullable|numeric|min:0',
+            'discountType' => 'nullable|string|max:255',
             'calculate_ttc' => 'boolean',
             'note' => 'nullable|string|max:255',
         ]);
@@ -246,7 +243,7 @@ class FactureController extends Controller
             'client_id' => $client->id,
             'nombre_operations' => count($request['operationfactures']),
             'date_creation' => now(),
-            'discount'=>$request['dpourcentage'],
+            'discount' => $request['dpourcentage'],
             'note' => $request->input('note'),
         ]);
 
@@ -263,25 +260,25 @@ class FactureController extends Controller
                 'nature' => $operationData['nature'],
                 'quantité' => $operationData['quantité'],
                 'montant_ht' => $operationData['montant_ht'],
-               // 'taux_tva' => $operationData['taux_tva'],
+                // 'taux_tva' => $operationData['taux_tva'],
 
                 'montant_ttc' => $operationData['montant_ht'] * (1 + $operationData['taux_tva'] / 100),
                 'taux_tva' => $tauxTva,
             ]);
 
-            
-                $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
-            
+
+            $operation->montant_ttc = $operationData['montant_ht'] * (1 + $tauxTva / 100);
+
 
             $facture->operationfactures()->save($operation);
 
             $totalMontantHt += $operationData['montant_ht'] * $operationData['quantité'];
             $totalMontantTtc += $operationData['montant_ht'] * (1 + 19 / 100) * $operationData['quantité'];
 
-          //  if (!$calculateTtc) {
-                // Only add to totalMontantTtc if calculateTtc is false
-          //      $totalMontantTtc += $operationData['montant_ht'] * (1 + ($operationData['taux_tva'] ?? 19) / 100) * $operationData['quantité'];
-            
+            //  if (!$calculateTtc) {
+            // Only add to totalMontantTtc if calculateTtc is false
+            //      $totalMontantTtc += $operationData['montant_ht'] * (1 + ($operationData['taux_tva'] ?? 19) / 100) * $operationData['quantité'];
+
         }
 
         if ($discountType != null) {
@@ -293,7 +290,7 @@ class FactureController extends Controller
                 $totalMontantTtc -= $disp;
             }
         }
-        
+
         $totalMontantTtc += 1.00; // Add 1% timbre
 
         // Convert the total montant to letters
@@ -326,7 +323,7 @@ class FactureController extends Controller
     public function show($id, Request $request)
     {
         $user = $request->user();
-        if (!$user->hasRole('admin')&!$user->hasRole('client')) {
+        if (!$user->hasRole('admin') & !$user->hasRole('client')) {
             abort(403, 'Unauthorized action.');
         }
         $facture = Facture::with('operationfactures')->findOrFail($id);
@@ -338,11 +335,11 @@ class FactureController extends Controller
     {
 
         $user = $request->user();
-        if (!$user->hasRole('admin')&!$user->hasRole('client')) {
+        if (!$user->hasRole('admin') & !$user->hasRole('client')) {
             abort(403, 'Unauthorized action.');
         }
         $user = $request->user();
-        
+
         $facture = Facture::with('operationfactures')->get();
 
         if ($user->hasRole('admin')) {

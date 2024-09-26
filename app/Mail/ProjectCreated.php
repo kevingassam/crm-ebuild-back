@@ -38,7 +38,7 @@ class ProjectCreated extends Mailable
     public function build()
     {
         return $this->view('emails.project-created')
-        ->from('crm@e-build.tn', config("app.name"))
+        
             ->subject('[EBUILD] New Project Created');
     }
 }

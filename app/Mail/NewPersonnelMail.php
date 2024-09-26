@@ -33,7 +33,7 @@ $this->password = $password;
     public function build()
     {
         return $this->subject('[EBUILD] Your new account has been created')
-        ->from('crm@e-build.tn', config("app.name"))
+        
             ->view('new_personnel');
     }
 }
