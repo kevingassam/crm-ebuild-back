@@ -210,7 +210,7 @@ class FactureController extends Controller
             return response()->json([
                 'message' => 'Les informations de personalisation du crm sont indisponibles!',
                 'statut' => false,
-            ]);
+            ],200);
         }
         $totalPriceWithTax = $facture->total_montant_ttc;
         $totalPriceWithTaxInWords = $this->convertMontantToLetters($totalPriceWithTax);
@@ -228,7 +228,7 @@ class FactureController extends Controller
                 'error' => $e->getMessage(),
                 'message' => "Echec de l'envoie de la facture",
                 'statut' => false,
-            ], 500);
+            ]);
         }
     }
 

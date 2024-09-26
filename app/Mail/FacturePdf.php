@@ -39,7 +39,6 @@ class FacturePdf extends Mailable
 
         return $this->view('emails.facture-pdf')
             ->subject('[EBUILD] Your Facture PDF')
-            
             ->attachData($this->pdf->output(), 'facture.pdf', [
                 'mime' => 'application/pdf',
             ]);
