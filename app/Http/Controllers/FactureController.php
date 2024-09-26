@@ -193,14 +193,14 @@ class FactureController extends Controller
         $facture = Facture::with('operationfactures')->find($id);
         if(!$facture){
             return response()->json([
-                'error' => 'Facture non trouvée',
+                'message' => 'Facture non trouvée',
                 'statut' => false,
             ], 404);
         }
         $client = Client::where('email', $facture->client_email)->first();
         if(!$client){
             return response()->json([
-                'error' => 'Client non trouvé',
+                'message' => 'Client non trouvé',
                 'statut' => false,
             ], 404);
         }
@@ -208,7 +208,7 @@ class FactureController extends Controller
         $ebuilddata = EbuildData::first();
         if(!$ebuilddata){
             return response()->json([
-                'error' => 'Les informations de personalisation du crm sont indisponibles!',
+                'message' => 'Les informations de personalisation du crm sont indisponibles!',
                 'statut' => false,
             ]);
         }
