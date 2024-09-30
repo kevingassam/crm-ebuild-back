@@ -80,20 +80,20 @@ class ClientController extends Controller
         $client->confirmation = $confirmer;
         $client->password = $password;
         $client->save();
-
-
-
         if ($user->save()) {
-            if ($confirmer) {
+
+
                 // Create a new user with role client in the user table
                 $user = new User();
                 $user->name = $request->input('name');
                 $user->email = $request->input('email');
                 $user->password = Hash::make($password);
+                $user->confirmed = $request->input('confirmed') ? true : false;
                 $user->role = 'client';
                 $client->save();
-            }
 
+
+                
             try {
                 Mail::to($client->email)->send(new NewClientMail($client, $password));
                 return response()->json(
@@ -174,6 +174,13 @@ class ClientController extends Controller
             return response()->json(['error' => 'Client not found'], 404);
         }
     }
+
+
+
+
+
+
+    
     public function deletec(Request $request, $id)
     {
         $user = $request->user();

@@ -232,6 +232,8 @@ class FactureController extends Controller
         }
     }
 
+    
+
     public function update(Request $request, $id)
     {
         $user = $request->user();

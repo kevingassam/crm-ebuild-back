@@ -343,7 +343,6 @@ class DevisController extends Controller
         // Passer la valeur convertie à la vue
         // Pass the image path to the view
         $imagePath = url('storage/images/' . basename($ebuilddata->logo));
-        \Log::info("Image Path: " . $imagePath);  // Log the image path
 
         $pdf = PDF::loadView('pdf.devis', compact('devis', 'phone_number', 'RNE', 'ebuilddata', 'totalPriceWithTaxInWords', 'imagePath'));
         Mail::to($devis->client_email)->send(new DevisPdf($devis, $pdf));
